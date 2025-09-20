@@ -13,7 +13,7 @@ function InterviewSetup(){
         try{
             const response = await fetch('http://localhost:5000/generate-questions', {
                 method: 'POST',
-                headers: {'Content-Type': 'applications/json'},
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ job_description: jobDescription}),
             })
             const data= await response.json();
@@ -41,7 +41,7 @@ function InterviewSetup(){
                     />
                 </label>
                 <br />
-                <button>
+                <button disabled={loading}>
                     {loading ? 'Generating Questions...': 'Generate Questions'}
                 </button>
             </form>

@@ -1,5 +1,5 @@
 import React from 'react';
-import InterviewSetup from './components/InterviewSetup';
+import InterviewSetup from './components/InterviewSetup.js';
 
 function App() {
   return (
