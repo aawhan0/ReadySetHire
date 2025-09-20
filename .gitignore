@@ -1,1 +1,15 @@
 backend/venv/
+
+
+# frontend/node_modules/
+
+
+# .env
+
+
+# frontend/build/
+# backend/__pycache__/
+
+
+# .DS_Store
+# Thumbs.db
