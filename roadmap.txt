@@ -1,0 +1,6 @@
+this file will contain the week-wise-progress.
+
+week 0-1: 
+1. Project Repository has been created, its named "ReadySetHire"
+2. requirements.txt file created
+3. Readme.md also created, and updated as well.
