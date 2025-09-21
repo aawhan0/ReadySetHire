@@ -1,34 +1,46 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import requests
-import os
+from google import genai
+from google.genai import types
+
+# Load Gemini API key from .env
+google_gemini_api_key = os.getenv("GOOGLE_GEMINI_API_KEY")
+
+# Initialize Gemini client with API key
+client = genai.Client(api_key=google_gemini_api_key)
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS so frontend can communicate with backend
+CORS(app, origins=["http://localhost:3000"])
 
 def generate_ai_questions(job_description):
-    api_key = os.getenv('AI_API_KEY')
-    headers = {"Authorization": f"Bearer {api_key}"}
-    # The API endpoint and payload depend on the provider you choose
-    payload = {
-        "model": "text-generation-model",
-        "prompt": f"Generate interview questions for the job: {job_description}",
-        "max_tokens": 150,
-    }
-    response = requests.post("https://api.example.com/generate", json=payload, headers=headers)
-    response_json = response.json()
-    questions = response_json.get("questions", [])
-    return questions
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=f"Generate interview questions for the job: {job_description}",
+            config=types.GenerateContentConfig(
+                max_output_tokens=150,
+                temperature=0.7,
+            ),
+        )
+        print("AI response received:", response.text)
+        text_output = response.text
+        questions = [q.strip() for q in text_output.split('\n') if q.strip()]
+        return questions
+    except Exception as e:
+        print("Error generating questions:", e)
+        return []
+
 @app.route('/')
 def home():
     return "ReadySetHire backend running"
 
-# Sample API endpoint for AI question generation (to be expanded)
 @app.route('/generate-questions', methods=['POST'])
 def generate_questions():
     data = request.json
     job_description = data.get('job_description', '')
-    # Placeholder response
     questions = generate_ai_questions(job_description)
     return jsonify({"questions": questions})
 
