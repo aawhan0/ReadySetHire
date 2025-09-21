@@ -4,6 +4,7 @@ frontend/node_modules/
 frontend/node_modules/.package-lock.json
 backend/__pycache__/
 backend/__pycache__/app.cpython-311.pyc
+*.pyc
 
 # .DS_Store
 # Thumbs.db
