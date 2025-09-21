@@ -4,3 +4,8 @@ week 0-1:
 1. Project Repository has been created, its named "ReadySetHire"
 2. requirements.txt file created
 3. Readme.md also created, and updated as well.
+
+* a lot of progress has been made. I have created a mock_question function
+it gives a bunch of prewritten questions in response when the user clicks the generate questions button.
+
+also, gemini integration has been done. to save the tokens i have created an env variable, currently set to false
