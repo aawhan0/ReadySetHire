@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google import genai
 from google.genai import types
+from utils import parse_gemini_output
 
 # Load Gemini API key from .env
 google_gemini_api_key = os.getenv("GOOGLE_GEMINI_API_KEY")
@@ -40,7 +41,7 @@ def generate_ai_questions(job_description):
         )
         print("AI response received:", response.text)
         text_output = response.text
-        questions = [q.strip() for q in text_output.split('\n') if q.strip()]
+        questions = parse_gemini_output(text_output)
         return questions
     except Exception as e:
         print("Error generating questions:", e)
