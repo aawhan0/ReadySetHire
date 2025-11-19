@@ -10,6 +10,7 @@ backend/__pycache__/app.cpython-311.pyc
 
 backend/training/voice
 backend/training/emotion/*
+backend/training/text
 
 # .DS_Store
 # Thumbs.db
