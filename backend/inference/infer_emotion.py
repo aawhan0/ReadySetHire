@@ -4,21 +4,29 @@ from PIL import Image
 import os
 import random
 
-class SimpleCNN(torch.nn.Module):
+class DeepCNN(torch.nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.conv = torch.nn.Sequential(
-            torch.nn.Conv2d(1, 8, 3), torch.nn.ReLU(),
+            torch.nn.Conv2d(1, 32, 3, padding=1), torch.nn.ReLU(),
+            torch.nn.MaxPool2d(2),
+            torch.nn.Conv2d(32, 64, 3, padding=1), torch.nn.ReLU(),
+            torch.nn.MaxPool2d(2),
+            torch.nn.Conv2d(64, 128, 3, padding=1), torch.nn.ReLU(),
+            torch.nn.MaxPool2d(2),
             torch.nn.Flatten()
         )
-        self.fc = torch.nn.Linear(8 * 46 * 46, num_classes)
+        self.fc = torch.nn.Sequential(
+            torch.nn.Linear(128 * 6 * 6, 256), torch.nn.ReLU(),
+            torch.nn.Linear(256, num_classes)
+        )
 
     def forward(self, x):
         x = self.conv(x)
         return self.fc(x)
 
 def load_model(model_path, num_classes, device):
-    model = SimpleCNN(num_classes=num_classes)
+    model = DeepCNN(num_classes=num_classes)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.to(device)
     model.eval()
@@ -43,6 +51,7 @@ if __name__ == "__main__":
 
     model = load_model(model_path, num_classes=len(classes), device=device)
 
+    # Sample images for testing
     image_list = []
     for class_name in classes:
         folder = os.path.join(data_dir, class_name)

@@ -3,31 +3,29 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
-from torch.utils.data import Subset, random_split, DataLoader
+from torch.utils.data import random_split, DataLoader
 from tqdm import tqdm
 
-class SimpleCNN(nn.Module):
+class DeepCNN(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.conv = nn.Sequential(
-            nn.Conv2d(1, 8, 3), nn.ReLU(),
+            nn.Conv2d(1, 32, 3, padding=1), nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, 3, padding=1), nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 3, padding=1), nn.ReLU(),
+            nn.MaxPool2d(2),
             nn.Flatten()
         )
-        self.fc = nn.Linear(8 * 46 * 46, num_classes)
+        self.fc = nn.Sequential(
+            nn.Linear(128 * 6 * 6, 256), nn.ReLU(),
+            nn.Linear(256, num_classes)
+        )
 
     def forward(self, x):
         x = self.conv(x)
         return self.fc(x)
-
-def get_balanced_indices(dataset, max_per_class=150):
-    class_counts = {i: 0 for i in range(len(dataset.classes))}
-    indices = []
-    for idx in range(len(dataset)):
-        label = dataset.imgs[idx][1]
-        if class_counts[label] < max_per_class:
-            indices.append(idx)
-            class_counts[label] += 1
-    return indices
 
 def evaluate(model, dataloader, device):
     model.eval()
@@ -47,30 +45,32 @@ def train():
     print(f"Using device: {device}")
 
     data_dir = 'training/emotion/train'
+
     transform = transforms.Compose([
         transforms.Grayscale(num_output_channels=1),
         transforms.Resize((48, 48)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(10),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2),
         transforms.ToTensor(),
     ])
+
     dataset = datasets.ImageFolder(data_dir, transform=transform)
 
-    subset_dataset = dataset  # use all dataset images
-
-
-    # Split into 80% train, 20% validation
-    total_size = len(subset_dataset)
+    # 80-20 split train/validation
+    total_size = len(dataset)
     val_size = int(0.2 * total_size)
     train_size = total_size - val_size
-    train_data, val_data = random_split(subset_dataset, [train_size, val_size])
+    train_data, val_data = random_split(dataset, [train_size, val_size])
 
     train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
     val_loader = DataLoader(val_data, batch_size=32, shuffle=False)
 
-    model = SimpleCNN(num_classes=len(dataset.classes)).to(device)
+    model = DeepCNN(num_classes=len(dataset.classes)).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    epochs = 10
+    epochs = 20
     for epoch in range(epochs):
         model.train()
         total_loss = 0
