@@ -1,6 +1,14 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Optional: Import animation or other external CSS, only if it's installed.
+   If 'tw-animate-css' is from a package or local file, you may use:
+   @import 'tw-animate-css';
+   Or put animations into its own file and import here.
+*/
+
+/* Custom Variant for dark mode */
 @custom-variant dark (&:is(.dark *));
 
 :root {
